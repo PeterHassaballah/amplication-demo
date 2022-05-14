@@ -14,6 +14,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsOptional, ValidateNested } from "class-validator";
 import { ProductUpdateManyWithoutUsersInput } from "./ProductUpdateManyWithoutUsersInput";
 import { Type } from "class-transformer";
+import { TaskUpdateManyWithoutUsersInput } from "./TaskUpdateManyWithoutUsersInput";
 @InputType()
 class UserUpdateInput {
   @ApiProperty({
@@ -73,6 +74,18 @@ class UserUpdateInput {
     nullable: true,
   })
   roles?: Array<string>;
+
+  @ApiProperty({
+    required: false,
+    type: () => TaskUpdateManyWithoutUsersInput,
+  })
+  @ValidateNested()
+  @Type(() => TaskUpdateManyWithoutUsersInput)
+  @IsOptional()
+  @Field(() => TaskUpdateManyWithoutUsersInput, {
+    nullable: true,
+  })
+  tasks?: TaskUpdateManyWithoutUsersInput;
 
   @ApiProperty({
     required: false,

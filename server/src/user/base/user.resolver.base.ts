@@ -15,12 +15,10 @@ import * as apollo from "apollo-server-express";
 import * as nestAccessControl from "nest-access-control";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
-import * as gqlUserRoles from "../../auth/gqlUserRoles.decorator";
-import * as abacUtil from "../../auth/abac.util";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { CreateUserArgs } from "./CreateUserArgs";
 import { UpdateUserArgs } from "./UpdateUserArgs";
 import { DeleteUserArgs } from "./DeleteUserArgs";
@@ -29,6 +27,8 @@ import { UserFindUniqueArgs } from "./UserFindUniqueArgs";
 import { User } from "./User";
 import { ProductFindManyArgs } from "../../product/base/ProductFindManyArgs";
 import { Product } from "../../product/base/Product";
+import { TaskFindManyArgs } from "../../task/base/TaskFindManyArgs";
+import { Task } from "../../task/base/Task";
 import { UserService } from "../user.service";
 
 @graphql.Resolver(() => User)
@@ -92,7 +92,6 @@ export class UserResolverBase {
     possession: "any",
   })
   async createUser(@graphql.Args() args: CreateUserArgs): Promise<User> {
-    // @ts-ignore
     return await this.service.create({
       ...args,
       data: args.data,
@@ -106,12 +105,8 @@ export class UserResolverBase {
     action: "update",
     possession: "any",
   })
-  async updateUser(
-    @graphql.Args() args: UpdateUserArgs,
-    @gqlUserRoles.UserRoles() userRoles: string[]
-  ): Promise<User | null> {
+  async updateUser(@graphql.Args() args: UpdateUserArgs): Promise<User | null> {
     try {
-      // @ts-ignore
       return await this.service.update({
         ...args,
         data: args.data,
@@ -134,7 +129,6 @@ export class UserResolverBase {
   })
   async deleteUser(@graphql.Args() args: DeleteUserArgs): Promise<User | null> {
     try {
-      // @ts-ignore
       return await this.service.delete(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -158,6 +152,26 @@ export class UserResolverBase {
     @graphql.Args() args: ProductFindManyArgs
   ): Promise<Product[]> {
     const results = await this.service.findProducts(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Task])
+  @nestAccessControl.UseRoles({
+    resource: "Task",
+    action: "read",
+    possession: "any",
+  })
+  async tasks(
+    @graphql.Parent() parent: User,
+    @graphql.Args() args: TaskFindManyArgs
+  ): Promise<Task[]> {
+    const results = await this.service.findTasks(parent.id, args);
 
     if (!results) {
       return [];

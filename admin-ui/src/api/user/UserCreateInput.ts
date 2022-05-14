@@ -1,4 +1,5 @@
 import { ProductCreateNestedManyWithoutUsersInput } from "./ProductCreateNestedManyWithoutUsersInput";
+import { TaskCreateNestedManyWithoutUsersInput } from "./TaskCreateNestedManyWithoutUsersInput";
 
 export type UserCreateInput = {
   firstName?: string | null;
@@ -6,5 +7,6 @@ export type UserCreateInput = {
   password: string;
   products?: ProductCreateNestedManyWithoutUsersInput;
   roles: Array<string>;
+  tasks?: TaskCreateNestedManyWithoutUsersInput;
   username: string;
 };

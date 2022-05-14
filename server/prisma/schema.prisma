@@ -15,6 +15,7 @@ model User {
   password  String
   products  Product[]
   roles     String[]
+  tasks     Task[]
   updatedAt DateTime  @updatedAt
   username  String    @unique
 }
@@ -67,4 +68,15 @@ model Product {
   updatedAt   DateTime @updatedAt
   user        User?    @relation(fields: [userId], references: [id])
   userId      String?
+}
+
+model Task {
+  createdAt  DateTime @default(now())
+  estimation String?
+  id         String   @id @default(cuid())
+  project    String?
+  title      String?
+  updatedAt  DateTime @updatedAt
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     String?
 }

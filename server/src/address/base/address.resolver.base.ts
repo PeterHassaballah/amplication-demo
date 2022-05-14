@@ -15,12 +15,10 @@ import * as apollo from "apollo-server-express";
 import * as nestAccessControl from "nest-access-control";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
-import * as gqlUserRoles from "../../auth/gqlUserRoles.decorator";
-import * as abacUtil from "../../auth/abac.util";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { CreateAddressArgs } from "./CreateAddressArgs";
 import { UpdateAddressArgs } from "./UpdateAddressArgs";
 import { DeleteAddressArgs } from "./DeleteAddressArgs";
@@ -98,7 +96,6 @@ export class AddressResolverBase {
   async createAddress(
     @graphql.Args() args: CreateAddressArgs
   ): Promise<Address> {
-    // @ts-ignore
     return await this.service.create({
       ...args,
       data: args.data,
@@ -113,11 +110,9 @@ export class AddressResolverBase {
     possession: "any",
   })
   async updateAddress(
-    @graphql.Args() args: UpdateAddressArgs,
-    @gqlUserRoles.UserRoles() userRoles: string[]
+    @graphql.Args() args: UpdateAddressArgs
   ): Promise<Address | null> {
     try {
-      // @ts-ignore
       return await this.service.update({
         ...args,
         data: args.data,
@@ -142,7 +137,6 @@ export class AddressResolverBase {
     @graphql.Args() args: DeleteAddressArgs
   ): Promise<Address | null> {
     try {
-      // @ts-ignore
       return await this.service.delete(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {

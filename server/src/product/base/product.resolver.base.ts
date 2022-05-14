@@ -15,12 +15,10 @@ import * as apollo from "apollo-server-express";
 import * as nestAccessControl from "nest-access-control";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
-import * as gqlUserRoles from "../../auth/gqlUserRoles.decorator";
-import * as abacUtil from "../../auth/abac.util";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { CreateProductArgs } from "./CreateProductArgs";
 import { UpdateProductArgs } from "./UpdateProductArgs";
 import { DeleteProductArgs } from "./DeleteProductArgs";
@@ -99,7 +97,6 @@ export class ProductResolverBase {
   async createProduct(
     @graphql.Args() args: CreateProductArgs
   ): Promise<Product> {
-    // @ts-ignore
     return await this.service.create({
       ...args,
       data: {
@@ -122,11 +119,9 @@ export class ProductResolverBase {
     possession: "any",
   })
   async updateProduct(
-    @graphql.Args() args: UpdateProductArgs,
-    @gqlUserRoles.UserRoles() userRoles: string[]
+    @graphql.Args() args: UpdateProductArgs
   ): Promise<Product | null> {
     try {
-      // @ts-ignore
       return await this.service.update({
         ...args,
         data: {
@@ -159,7 +154,6 @@ export class ProductResolverBase {
     @graphql.Args() args: DeleteProductArgs
   ): Promise<Product | null> {
     try {
-      // @ts-ignore
       return await this.service.delete(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {

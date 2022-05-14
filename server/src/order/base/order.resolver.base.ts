@@ -15,12 +15,10 @@ import * as apollo from "apollo-server-express";
 import * as nestAccessControl from "nest-access-control";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as gqlACGuard from "../../auth/gqlAC.guard";
-import * as gqlUserRoles from "../../auth/gqlUserRoles.decorator";
-import * as abacUtil from "../../auth/abac.util";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { CreateOrderArgs } from "./CreateOrderArgs";
 import { UpdateOrderArgs } from "./UpdateOrderArgs";
 import { DeleteOrderArgs } from "./DeleteOrderArgs";
@@ -94,7 +92,6 @@ export class OrderResolverBase {
     possession: "any",
   })
   async createOrder(@graphql.Args() args: CreateOrderArgs): Promise<Order> {
-    // @ts-ignore
     return await this.service.create({
       ...args,
       data: {
@@ -123,11 +120,9 @@ export class OrderResolverBase {
     possession: "any",
   })
   async updateOrder(
-    @graphql.Args() args: UpdateOrderArgs,
-    @gqlUserRoles.UserRoles() userRoles: string[]
+    @graphql.Args() args: UpdateOrderArgs
   ): Promise<Order | null> {
     try {
-      // @ts-ignore
       return await this.service.update({
         ...args,
         data: {
@@ -166,7 +161,6 @@ export class OrderResolverBase {
     @graphql.Args() args: DeleteOrderArgs
   ): Promise<Order | null> {
     try {
-      // @ts-ignore
       return await this.service.delete(args);
     } catch (error) {
       if (isRecordNotFoundError(error)) {

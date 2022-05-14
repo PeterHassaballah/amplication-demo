@@ -1,4 +1,5 @@
 import { Product } from "../product/Product";
+import { Task } from "../task/Task";
 
 export type User = {
   createdAt: Date;
@@ -7,6 +8,7 @@ export type User = {
   lastName: string | null;
   products?: Array<Product>;
   roles: Array<string>;
+  tasks?: Array<Task>;
   updatedAt: Date;
   username: string;
 };

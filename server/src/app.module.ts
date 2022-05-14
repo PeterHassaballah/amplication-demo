@@ -1,14 +1,16 @@
-import { Module } from "@nestjs/common";
+import { Module, Scope } from "@nestjs/common";
+import { APP_INTERCEPTOR } from "@nestjs/core";
+import { MorganInterceptor, MorganModule } from "nest-morgan";
 import { UserModule } from "./user/user.module";
 import { OrderModule } from "./order/order.module";
 import { CustomerModule } from "./customer/customer.module";
 import { AddressModule } from "./address/address.module";
 import { ProductModule } from "./product/product.module";
+import { TaskModule } from "./task/task.module";
 import { ACLModule } from "./auth/acl.module";
 import { AuthModule } from "./auth/auth.module";
 import { HealthModule } from "./health/health.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
-import { MorganModule } from "nest-morgan";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { ServeStaticOptionsService } from "./serveStaticOptions.service";
@@ -22,6 +24,7 @@ import { GraphQLModule } from "@nestjs/graphql";
     CustomerModule,
     AddressModule,
     ProductModule,
+    TaskModule,
     ACLModule,
     AuthModule,
     HealthModule,
@@ -46,6 +49,12 @@ import { GraphQLModule } from "@nestjs/graphql";
       imports: [ConfigModule],
     }),
   ],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      scope: Scope.REQUEST,
+      useClass: MorganInterceptor("combined"),
+    },
+  ],
 })
 export class AppModule {}

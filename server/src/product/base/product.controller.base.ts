@@ -11,18 +11,16 @@ https://docs.amplication.com/docs/how-to/custom-code
   */
 import * as common from "@nestjs/common";
 import * as swagger from "@nestjs/swagger";
-import * as nestMorgan from "nest-morgan";
 import * as nestAccessControl from "nest-access-control";
 import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
-import * as abacUtil from "../../auth/abac.util";
 import { isRecordNotFoundError } from "../../prisma.util";
 import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
+import { ProductService } from "../product.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
-import { ProductService } from "../product.service";
 import { ProductCreateInput } from "./ProductCreateInput";
 import { ProductWhereInput } from "./ProductWhereInput";
 import { ProductWhereUniqueInput } from "./ProductWhereUniqueInput";
@@ -33,24 +31,20 @@ import { OrderFindManyArgs } from "../../order/base/OrderFindManyArgs";
 import { Order } from "../../order/base/Order";
 import { OrderWhereUniqueInput } from "../../order/base/OrderWhereUniqueInput";
 @swagger.ApiBearerAuth()
+@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class ProductControllerBase {
   constructor(
     protected readonly service: ProductService,
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {}
 
-  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
   @common.UseInterceptors(AclValidateRequestInterceptor)
-  @common.UseGuards(
-    defaultAuthGuard.DefaultAuthGuard,
-    nestAccessControl.ACGuard
-  )
-  @common.Post()
   @nestAccessControl.UseRoles({
     resource: "Product",
     action: "create",
     possession: "any",
   })
+  @common.Post()
   @swagger.ApiCreatedResponse({ type: Product })
   @swagger.ApiForbiddenResponse({ type: errors.ForbiddenException })
   async create(@common.Body() data: ProductCreateInput): Promise<Product> {
@@ -81,18 +75,13 @@ export class ProductControllerBase {
     });
   }
 
-  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.UseGuards(
-    defaultAuthGuard.DefaultAuthGuard,
-    nestAccessControl.ACGuard
-  )
-  @common.Get()
   @nestAccessControl.UseRoles({
     resource: "Product",
     action: "read",
     possession: "any",
   })
+  @common.Get()
   @swagger.ApiOkResponse({ type: [Product] })
   @swagger.ApiForbiddenResponse()
   @ApiNestedQuery(ProductFindManyArgs)
@@ -117,18 +106,13 @@ export class ProductControllerBase {
     });
   }
 
-  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.UseGuards(
-    defaultAuthGuard.DefaultAuthGuard,
-    nestAccessControl.ACGuard
-  )
-  @common.Get("/:id")
   @nestAccessControl.UseRoles({
     resource: "Product",
     action: "read",
     possession: "own",
   })
+  @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Product })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   @swagger.ApiForbiddenResponse({ type: errors.ForbiddenException })
@@ -160,18 +144,13 @@ export class ProductControllerBase {
     return result;
   }
 
-  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
   @common.UseInterceptors(AclValidateRequestInterceptor)
-  @common.UseGuards(
-    defaultAuthGuard.DefaultAuthGuard,
-    nestAccessControl.ACGuard
-  )
-  @common.Patch("/:id")
   @nestAccessControl.UseRoles({
     resource: "Product",
     action: "update",
     possession: "any",
   })
+  @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Product })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   @swagger.ApiForbiddenResponse({ type: errors.ForbiddenException })
@@ -216,17 +195,12 @@ export class ProductControllerBase {
     }
   }
 
-  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
-  @common.UseGuards(
-    defaultAuthGuard.DefaultAuthGuard,
-    nestAccessControl.ACGuard
-  )
-  @common.Delete("/:id")
   @nestAccessControl.UseRoles({
     resource: "Product",
     action: "delete",
     possession: "any",
   })
+  @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: Product })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   @swagger.ApiForbiddenResponse({ type: errors.ForbiddenException })
@@ -261,18 +235,13 @@ export class ProductControllerBase {
     }
   }
 
-  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @common.UseGuards(
-    defaultAuthGuard.DefaultAuthGuard,
-    nestAccessControl.ACGuard
-  )
-  @common.Get("/:id/orders")
   @nestAccessControl.UseRoles({
     resource: "Order",
     action: "read",
     possession: "any",
   })
+  @common.Get("/:id/orders")
   @ApiNestedQuery(OrderFindManyArgs)
   async findManyOrders(
     @common.Req() request: Request,
@@ -312,17 +281,12 @@ export class ProductControllerBase {
     return results;
   }
 
-  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
-  @common.UseGuards(
-    defaultAuthGuard.DefaultAuthGuard,
-    nestAccessControl.ACGuard
-  )
-  @common.Post("/:id/orders")
   @nestAccessControl.UseRoles({
     resource: "Product",
     action: "update",
     possession: "any",
   })
+  @common.Post("/:id/orders")
   async connectOrders(
     @common.Param() params: ProductWhereUniqueInput,
     @common.Body() body: OrderWhereUniqueInput[]
@@ -339,17 +303,12 @@ export class ProductControllerBase {
     });
   }
 
-  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
-  @common.UseGuards(
-    defaultAuthGuard.DefaultAuthGuard,
-    nestAccessControl.ACGuard
-  )
-  @common.Patch("/:id/orders")
   @nestAccessControl.UseRoles({
     resource: "Product",
     action: "update",
     possession: "any",
   })
+  @common.Patch("/:id/orders")
   async updateOrders(
     @common.Param() params: ProductWhereUniqueInput,
     @common.Body() body: OrderWhereUniqueInput[]
@@ -366,17 +325,12 @@ export class ProductControllerBase {
     });
   }
 
-  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
-  @common.UseGuards(
-    defaultAuthGuard.DefaultAuthGuard,
-    nestAccessControl.ACGuard
-  )
-  @common.Delete("/:id/orders")
   @nestAccessControl.UseRoles({
     resource: "Product",
     action: "update",
     possession: "any",
   })
+  @common.Delete("/:id/orders")
   async disconnectOrders(
     @common.Param() params: ProductWhereUniqueInput,
     @common.Body() body: OrderWhereUniqueInput[]
